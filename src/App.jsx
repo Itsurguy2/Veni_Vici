@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import backgroundImage from './assets/suitcase_bg.png';
+import { Route, Routes, Link } from 'react-router-dom';
+import PhotoDetail from './components/PhotoDetail';
 
 function App() {
   const [items, setItems] = useState([]);
@@ -67,8 +69,11 @@ function App() {
 
   useEffect(() => {
     console.log('API Key available:', !!import.meta.env.VITE_UNSPLASH_ACCESS_KEY);
-    fetchImages();
-  }, []);
+    // Only fetch images if there are none in state
+    if (items.length === 0) {
+      fetchImages();
+    }
+  }, []);  // Keep the empty dependency array
 
   useEffect(() => {
     calculateStats();
@@ -624,7 +629,12 @@ function App() {
 
       <div className="photos-list">
         {filterItems().map((item, index) => (
-          <div key={item.id || index} className="photo-row">
+          <Link 
+            to={`/photo/${item.id}`} 
+            key={item.id || index} 
+            className="photo-row"
+            onClick={() => localStorage.setItem('currentPhoto', JSON.stringify(item))}
+          >
             <div className="photo-preview">
               <img 
                 src={item.urls.small} 
@@ -655,7 +665,7 @@ function App() {
                 <p>{new Date(item.created_at).toLocaleDateString()}</p>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
